@@ -126,7 +126,7 @@ This list is created with the `ots-pauses-search-pauses'.")
 		   (org-element-property :begin next-element))))
 
    ((eq (org-element-type next-element) 'item)
-    ;; only the second one is an item, the first one is a pause
+    ;; the first one is a pause, the second one is an item
     (list
      (make-overlay (org-element-property :end element)
 		   (org-element-property :begin next-element))
@@ -142,6 +142,21 @@ This list is created with the `ots-pauses-search-pauses'.")
    ) ;; cond
   ) ;; defun
 
+(defun ots-pauses--partition (lst-elements)
+  "Partition of the LST-ELEMENTS into list of two elements."
+
+  (let ((prev nil)
+	(result '()))
+    
+    (dolist (element lst-elements)
+      (add-to-list 'result (cons prev element) t)
+      (setq prev element)
+      )
+
+    (cdr result))
+  
+  ) ;; defun
+
 
 (defun ots-pauses--new-overlay-for-pauses ()
   "Return new overlays for all elements that needs to be paused."
@@ -149,14 +164,10 @@ This list is created with the `ots-pauses-search-pauses'.")
    nil
    (apply #'append
 	  (mapcar (lambda (element)
-		    (if (cadr element)
-			(ots-pauses--new-overlay-for-pair (car element)
-							 (cadr element))
-		      (list
-		       (make-overlay
-			(org-element-property :begin element)
-			(org-element-property :end element)))))
-		  (seq-partition (ots-pauses--search-elements) 2)
+		    (ots-pauses--new-overlay-for-pair (car element)
+						     (cdr element))
+		    )
+		  (ots-pauses--partition (ots-pauses--search-elements))
 		  )
 	  )
    )

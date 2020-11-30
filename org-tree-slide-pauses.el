@@ -63,33 +63,62 @@ This list is created with the `ots-pauses-search-pauses'.")
   ) ;; defun
 
 
+(defun ots-pauses--search-elements ()
+  "Search all items that needs pauses and return the org-element list."
+  
+  (org-element-map (org-element-parse-buffer nil t) '(comment item keyword)
+    (lambda (element)
+      "If it is one of the pauses, return their positions"
+      (cond
+
+       ((eq (org-element-type element) 'keyword)
+	(if (or (string-equal (org-element-property :key element) "PAUSE")
+		(and (string-equal (org-element-property :key element)
+				   "BEAMER")
+		     (string-equal (org-element-property :value element)
+				   "\\pause")))
+	    element  
+	  nil))
+       
+       ((eq (org-element-type element) 'comment)
+	(if (string-equal (org-element-property :value element) "pause")
+	    element
+	  nil))
+       
+       (t element)
+       )))
+  ) ;; defun
+
+(defun ots-pauses--new-overlay-for-text ()
+  "Return new overlays for all elements that needs to be hidden."
+
+  (mapcar (lambda (element)
+	    (make-overlay
+	     (org-element-property :begin element)
+	     (org-element-property :end element))
+	    )
+	  (ots-pauses--search-elements))
+  
+  ) ;; defun
+
+(defun ots-pauses--new-overlay-for-pauses ()
+  "Return new overlays for all elements that needs to be paused."
+  (mapcar (lambda (element)
+	    (make-overlay
+	     (org-element-property :end (car element))
+	     (org-element-property :begin (cadr element)))
+	    )
+	  (seq-partition (ots-pauses--search-elements) 2)
+	  )
+  ) ;; defun
+
+
 (defun ots-pauses-search-pauses ()
   "Hide all pauses."
   (ots-pauses-clear-overlay-list)
 
-  (save-excursion
-    (goto-char (point-min))
-    (while (search-forward-regexp ots-pauses-pause-regexp nil t)
-      (let ((begin-text-1 (match-beginning 0))			
-	    (begin-pause (match-end 0))
-	    (end-pause (if (search-forward-regexp
-			    ots-pauses-pause-regexp nil t)
-			   (match-beginning 0)
-			 nil))
-	    (end-text-2 (match-end 0)))
-	(when end-pause
-	  (add-to-list 'ots-pauses-pause-text-list
-		       (make-overlay begin-text-1 begin-pause) t)
-	  (add-to-list 'ots-pauses-pause-text-list
-		       (make-overlay end-pause end-text-2) t)
-	  
-	  (add-to-list 'ots-pauses-overlay-lists
-		       (make-overlay (1+ begin-pause) (1- end-pause)) t)
-	  ) ;; when
-	) ;; let
-      ) ;; while
-    ) ;; save-excursion
-
+  (setq ots-pauses-pause-text-list (ots-pauses--new-overlay-for-text))
+  (setq ots-pauses-overlay-lists (ots-pauses--new-overlay-for-pauses))
   )
 
 (defun ots-pauses-hide-pauses ()

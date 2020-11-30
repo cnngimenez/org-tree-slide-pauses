@@ -103,6 +103,7 @@ This list is created with the `ots-pauses-search-pauses'.")
 (defun ots-pauses-init ()
   "This function is intended to be added to the `org-tree-slide-mode-hook'
 to start the pauses parsing."
+  (message "ots-pauses-init")
   (ots-pauses-search-pauses)
   (ots-pauses-hide-pauses)
   ) ;; defun
@@ -115,9 +116,7 @@ to start the pauses parsing."
 
 (defun ots-pauses-next-pause ()
   "Show next pause"
-  (interactive)
-  ;; (ots-pauses-update-overlays) ;; Just in case the user edited the buffer
-
+  
   (when (nth ots-pauses-current-pause ots-pauses-overlay-lists)
     (overlay-put (nth ots-pauses-current-pause ots-pauses-overlay-lists)
 		 'face nil)
@@ -125,7 +124,26 @@ to start the pauses parsing."
     )
   ) ;; defun
 
-(add-hook 'org-tree-slide-before-content-view-hook
-	  'ots-pauses-init)
+
+(defun ots-pauses-next-advice ()
+  " "
+  (interactive)
+  (if (>= ots-pauses-current-pause (length ots-pauses-overlay-lists))       
+      (progn
+	(org-tree-slide-move-next-tree)
+	;; Parse the current slide, or just in case the user edited the buffer
+	(ots-pauses-init)
+	)
+    (progn
+      (ots-pauses-next-pause)
+      (message (format "Pauses: %d/%d"
+		       ots-pauses-current-pause
+		       (length ots-pauses-overlay-lists)))
+      )
+    )
+  ) ;; defun
+
+
+(add-hook 'org-tree-slide-after-narrow-hook 'ots-pauses-init)
 
 ;;; org-tree-slide-pauses.el ends here

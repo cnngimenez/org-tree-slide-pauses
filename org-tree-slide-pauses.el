@@ -97,7 +97,8 @@ This list is created with the `ots-pauses-search-pauses'.")
 
   (delq nil
 	(mapcar (lambda (element)
-		  (unless (eq (org-element-type element) 'item)
+		  (unless (member (org-element-type element)
+				  '(item headline))
 		    (make-overlay
 		     (org-element-property :begin element)
 		     (org-element-property :end element)))
@@ -199,7 +200,6 @@ This list is created with the `ots-pauses-search-pauses'.")
 (defun ots-pauses-init ()
   "This function is intended to be added to the `org-tree-slide-mode-hook'
 to start the pauses parsing."
-  (message "ots-pauses-init")
   (ots-pauses-search-pauses)
   (ots-pauses-hide-pauses)
   ) ;; defun

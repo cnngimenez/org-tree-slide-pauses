@@ -7,4 +7,4 @@ Well, I thought "why not add a pause command at org-tree-slides?"!
 
 This is what I mean:
 
-https://github.com/cnngimenez/org-tree-slide-pauses/blob/main/demos/pause1.gif
+[[./demos/pause1.gif]]

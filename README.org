@@ -8,3 +8,7 @@ Well, I thought "why not add a pause command at org-tree-slides?"!
 This is what I mean:
 
 [[./demos/pause1.gif]]
+
+And this:
+
+[[./demos/pause2.webm]]

@@ -68,7 +68,8 @@ This list is created with the `ots-pauses-search-pauses'.")
 
   (delq
    nil
-   (org-element-map (org-element-parse-buffer nil t) '(comment item keyword)
+   (org-element-map (org-element-parse-buffer nil t)
+       '(comment item keyword headline)
      (lambda (element)
        "If it is one of the pauses, return their positions"
        (cond
@@ -132,6 +133,10 @@ This list is created with the `ots-pauses-search-pauses'.")
 		   (org-element-property :begin next-element))
      (make-overlay (org-element-property :begin next-element)
 		   (org-element-property :end next-element))))
+
+   ((and (eq (org-element-type element) 'headline))
+    ;; the first is a headline, ignore it.
+    nil)
 
    (t
     ;; both of them are pauses

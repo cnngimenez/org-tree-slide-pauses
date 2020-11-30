@@ -1,0 +1,9 @@
+- Do you like the [[https://github.com/takaxp/org-tree-slide][org-tree-slide]] animations?  Yes?  Me too!
+- You don't want to show all the slide's text at once while explaining, right?
+- Do you want to hide some text first and showing it slowly and when the time comes?
+- Do you remember the \pause at Beamer and you want it now?
+
+Well, I thought "why not add a pause command at org-tree-slides?"!
+
+This is what I mean:
+https://github.com/cnngimenez/org-tree-slide-pauses/blob/main/demos/pause1.webm

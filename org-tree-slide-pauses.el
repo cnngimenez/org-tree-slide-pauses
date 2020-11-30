@@ -79,12 +79,13 @@ This list is created with the `ots-pauses-search-pauses'.")
 	    (end-text-2 (match-end 0)))
 	(when end-pause
 	  (add-to-list 'ots-pauses-pause-text-list
-		       (make-overlay begin-text-1 begin-pause))
+		       (make-overlay begin-text-1 begin-pause) t)
 	  (add-to-list 'ots-pauses-pause-text-list
-		       (make-overlay end-pause end-text-2))
+		       (make-overlay end-pause end-text-2) t)
 	  
 	  (add-to-list 'ots-pauses-overlay-lists
-		       (make-overlay (1+ begin-pause) (1- end-pause))))
+		       (make-overlay (1+ begin-pause) (1- end-pause)) t)
+	  ) ;; when
 	) ;; let
       ) ;; while
     ) ;; save-excursion
@@ -125,14 +126,15 @@ to start the pauses parsing."
   ) ;; defun
 
 
-(defun ots-pauses-next-advice ()
+(defun ots-pauses-next-advice (ots-move-next-tree &rest args)
   " "
   (interactive)
   (if (>= ots-pauses-current-pause (length ots-pauses-overlay-lists))       
       (progn
-	(org-tree-slide-move-next-tree)
+	(apply ots-move-next-tree args)
 	;; Parse the current slide, or just in case the user edited the buffer
-	(ots-pauses-init)
+	
+	;; (ots-pauses-init)
 	)
     (progn
       (ots-pauses-next-pause)
@@ -143,6 +145,7 @@ to start the pauses parsing."
     )
   ) ;; defun
 
+(advice-add 'org-tree-slide-move-next-tree :around #'ots-pauses-next-advice)
 
 (add-hook 'org-tree-slide-after-narrow-hook 'ots-pauses-init)
 

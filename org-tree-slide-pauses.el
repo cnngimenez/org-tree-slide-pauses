@@ -65,51 +65,101 @@ This list is created with the `ots-pauses-search-pauses'.")
 
 (defun ots-pauses--search-elements ()
   "Search all items that needs pauses and return the org-element list."
-  
-  (org-element-map (org-element-parse-buffer nil t) '(comment item keyword)
-    (lambda (element)
-      "If it is one of the pauses, return their positions"
-      (cond
 
-       ((eq (org-element-type element) 'keyword)
-	(if (or (string-equal (org-element-property :key element) "PAUSE")
-		(and (string-equal (org-element-property :key element)
-				   "BEAMER")
-		     (string-equal (org-element-property :value element)
-				   "\\pause")))
-	    element  
-	  nil))
-       
-       ((eq (org-element-type element) 'comment)
-	(if (string-equal (org-element-property :value element) "pause")
-	    element
-	  nil))
-       
-       (t element)
-       )))
+  (delq
+   nil
+   (org-element-map (org-element-parse-buffer nil t) '(comment item keyword)
+     (lambda (element)
+       "If it is one of the pauses, return their positions"
+       (cond
+
+	((eq (org-element-type element) 'keyword)
+	 (if (or (string-equal (org-element-property :key element) "PAUSE")
+		 (and (string-equal (org-element-property :key element)
+				    "BEAMER")
+		      (string-equal (org-element-property :value element)
+				    "\\pause")))
+	     element  
+	   nil))
+	
+	((eq (org-element-type element) 'comment)
+	 (if (string-equal (org-element-property :value element) "pause")
+	     element
+	   nil))
+	
+	(t element)
+	))))
   ) ;; defun
 
 (defun ots-pauses--new-overlay-for-text ()
   "Return new overlays for all elements that needs to be hidden."
 
-  (mapcar (lambda (element)
-	    (make-overlay
-	     (org-element-property :begin element)
-	     (org-element-property :end element))
-	    )
-	  (ots-pauses--search-elements))
+  (delq nil
+	(mapcar (lambda (element)
+		  (unless (eq (org-element-type element) 'item)
+		    (make-overlay
+		     (org-element-property :begin element)
+		     (org-element-property :end element)))
+		  )
+		(ots-pauses--search-elements)))
   
   ) ;; defun
 
+(defun ots-pauses--new-overlay-for-pair (element next-element)
+  "Creates overlays for a consecutive pair of elements."
+  (cond
+   ((and (eq (org-element-type element) 'item)
+	 (eq (org-element-type next-element) 'item))
+    ;; both are items
+    (list 
+     (make-overlay (org-element-property :begin element)
+		   (org-element-property :end element))
+     (make-overlay (org-element-property :begin next-element)
+		   (org-element-property :end next-element))))
+
+   ((eq (org-element-type element) 'item)
+    ;; only the first one is an item, the second one is a pause
+    (list
+     (make-overlay (org-element-property :begin element)
+		   (org-element-property :end element))
+     (make-overlay (org-element-property :end element)
+		   (org-element-property :begin next-element))))
+
+   ((eq (org-element-type next-element) 'item)
+    ;; only the second one is an item, the first one is a pause
+    (list
+     (make-overlay (org-element-property :end element)
+		   (org-element-property :begin next-element))
+     (make-overlay (org-element-property :begin next-element)
+		   (org-element-property :end next-element))))
+
+   (t
+    ;; both of them are pauses
+    (list
+     (make-overlay (org-element-property :end element)
+		   (org-element-property :begin next-element)))
+    )
+   ) ;; cond
+  ) ;; defun
+
+
 (defun ots-pauses--new-overlay-for-pauses ()
   "Return new overlays for all elements that needs to be paused."
-  (mapcar (lambda (element)
-	    (make-overlay
-	     (org-element-property :end (car element))
-	     (org-element-property :begin (cadr element)))
-	    )
-	  (seq-partition (ots-pauses--search-elements) 2)
+  (delq
+   nil
+   (apply #'append
+	  (mapcar (lambda (element)
+		    (if (cadr element)
+			(ots-pauses--new-overlay-for-pair (car element)
+							 (cadr element))
+		      (list
+		       (make-overlay
+			(org-element-property :begin element)
+			(org-element-property :end element)))))
+		  (seq-partition (ots-pauses--search-elements) 2)
+		  )
 	  )
+   )
   ) ;; defun
 
 

@@ -11,4 +11,4 @@ This is what I mean:
 
 And this:
 
-[[./demos/pause2.webm]]
+[[./demos/pause2.gif]]

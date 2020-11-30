@@ -108,8 +108,33 @@ This list is created with the `ots-pauses-search-pauses'.")
   ) ;; defun
 
 (defun ots-pauses--new-overlay-for-pair (element next-element)
-  "Creates overlays for a consecutive pair of elements."
+  "Creates overlays for a consecutive pair of elements.
+Returns nil when:
+- There are blanks texts between pauses (no text to show).
+- The first one is a headline (no pauses between headline and first item)"
   (cond
+   ((and (eq (org-element-type element) 'headline))
+    ;; the first is a headline, ignore it.
+    nil)
+
+   ((and (numberp next-element)
+	 (eq (org-element-type element) 'item))
+    ;; It's the last and the previous is an item
+    (list
+     (make-overlay (org-element-property :begin element)
+		   (org-element-property :end element))
+     (unless (string-blank-p (buffer-substring-no-properties
+			      (org-element-property :end element)
+			      next-element))
+       (make-overlay (org-element-property :end element) next-element))))
+
+    ((and (numberp next-element))
+     ;; It's the last and the previous is a pause
+     (unless (string-blank-p (buffer-substring-no-properties
+			      (org-element-property :end element)
+			      next-element))
+       (list (make-overlay (org-element-property :end element) next-element))))
+
    ((and (eq (org-element-type element) 'item)
 	 (eq (org-element-type next-element) 'item))
     ;; both are items
@@ -122,27 +147,34 @@ This list is created with the `ots-pauses-search-pauses'.")
     (list
      (make-overlay (org-element-property :begin element)
 		   (org-element-property :end element))
-     (make-overlay (org-element-property :end element)
-		   (org-element-property :begin next-element))))
+     (unless (string-blank-p (buffer-substring-no-properties
+			      (org-element-property :end element)
+			      (org-element-property :begin next-element)))
+       (make-overlay (org-element-property :end element)
+		     (org-element-property :begin next-element)))))
 
    ((eq (org-element-type next-element) 'item)
     ;; the first one is a pause/headline, the second one is an item
     (list
-     (make-overlay (org-element-property :end element)
-		   (org-element-property :begin next-element))
+     (unless (string-blank-p (buffer-substring-no-properties
+			      (org-element-property :end element)
+			      (org-element-property :begin next-element)))
+       (make-overlay (org-element-property :end element)
+		     (org-element-property :begin next-element))
+       )
      (make-overlay (org-element-property :begin next-element)
 		   (org-element-property :end next-element))))
 
-   ((and (eq (org-element-type element) 'headline))
-    ;; the first is a headline, ignore it.
-    nil)
-
    (t
     ;; both of them are pauses
-    (list
-     (make-overlay (org-element-property :end element)
-		   (org-element-property :begin next-element)))
-    )
+    (if (string-blank-p (buffer-substring-no-properties
+			 (org-element-property :end element)
+			 (org-element-property :begin next-element)))
+	nil
+      (list
+       (make-overlay (org-element-property :end element)
+		     (org-element-property :begin next-element)))))
+
    ) ;; cond
   ) ;; defun
 
@@ -157,6 +189,9 @@ This list is created with the `ots-pauses-search-pauses'.")
       (setq prev element)
       )
 
+    (when prev
+      (add-to-list 'result (cons prev (point-max)) t))
+    
     (cdr result))
   
   ) ;; defun

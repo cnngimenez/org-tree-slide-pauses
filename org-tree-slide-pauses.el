@@ -115,12 +115,10 @@ This list is created with the `ots-pauses-search-pauses'.")
     ;; both are items
     (list 
      (make-overlay (org-element-property :begin element)
-		   (org-element-property :end element))
-     (make-overlay (org-element-property :begin next-element)
-		   (org-element-property :end next-element))))
+		   (org-element-property :end element))))
 
    ((eq (org-element-type element) 'item)
-    ;; only the first one is an item, the second one is a pause
+    ;; the first one is an item, the second one is a pause/headline
     (list
      (make-overlay (org-element-property :begin element)
 		   (org-element-property :end element))
@@ -128,7 +126,7 @@ This list is created with the `ots-pauses-search-pauses'.")
 		   (org-element-property :begin next-element))))
 
    ((eq (org-element-type next-element) 'item)
-    ;; the first one is a pause, the second one is an item
+    ;; the first one is a pause/headline, the second one is an item
     (list
      (make-overlay (org-element-property :end element)
 		   (org-element-property :begin next-element))
@@ -190,12 +188,23 @@ This list is created with the `ots-pauses-search-pauses'.")
 
 (defun ots-pauses-hide-pauses ()
   "Hide all pauses."
+  (interactive)
   (dolist (the-overlay ots-pauses-pause-text-list)
     (overlay-put the-overlay 'invisible t))
   
   (dolist (the-overlay ots-pauses-overlay-lists)
     (overlay-put the-overlay 'face 'shadow))
   ) ;; defun
+
+(defun ots-pauses-show-pauses ()
+  "Show everything to edit the buffer easily.
+This do not deletes the overlays that hides the pauses commands, it only make
+them visibles."
+  (interactive)
+  (dolist (the-overlay ots-pauses-pause-text-list)
+    (overlay-put the-overlay 'invisible nil))
+  ) ;; defun
+
 
 (defun ots-pauses-init ()
   "This function is intended to be added to the `org-tree-slide-mode-hook'

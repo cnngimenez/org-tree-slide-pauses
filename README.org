@@ -12,3 +12,22 @@ This is what I mean:
 And this:
 
 [[./demos/pause2.gif]]
+
+* Usage
+- List items and enumerations works automatically.
+- Add one of the following to create a pause:
+
+:   # pause
+:   #+pause:
+:   #+beamer: \pause
+
+When you start to presenting with ~org-tree-slide-mode~ the text between  pauses will appear with the "shadow" face.  Use the C-> (M-x ~org-tree-slide-move-next-tree~) to show one by one. If there is no more text to reveal, the same command will show the next slide/title like usual.
+
+* Contribution
+
+Are always welcome!
+
+* License
+[[https://www.gnu.org/graphics/gplv3-with-text-136x68.png]]
+
+This work is under the GNU General Public License version 3. See https://www.gnu.org/licenses/gpl-3.0.html for more information.

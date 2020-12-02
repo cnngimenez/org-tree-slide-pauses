@@ -3,10 +3,11 @@
 ;; Copyright 2020 cnngimenez
 ;;
 ;; Author: cnngimenez
+;; Maintainer: cnngimenez
 ;; Version: 0.1.0
 ;; Keywords: convenience, org-mode, presentation
 ;; URL: https://github.com/cnngimenez/org-tree-slide-pauses
-;; Package-Requires: ((emacs "24.4"))
+;; Package-Requires: ((emacs "24.4") (org-tree-slide "2.8.4"))
 
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by

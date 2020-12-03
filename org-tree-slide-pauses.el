@@ -250,9 +250,7 @@ them visibles."
 
 (defconst org-tree-slide-pauses-images-props-hidden
   '(:conversion emboss :mask heuristic)
-  "What properties to add or remove when hidding or showing images
-respectivelly."
-  ) ;; defconst
+  "What properties to add or remove when hidding or showing images." ) ;; defconst
 
 
 (defun org-tree-slide-pauses-hide-image (overlay)

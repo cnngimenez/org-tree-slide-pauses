@@ -302,7 +302,7 @@ pauses parsing."
 
 (defun org-tree-slide-pauses-end-hook ()
   "This is a hook for `org-tree-slide-mode-hook' to restore the buffer.
-Restore the buffer if the org-tree-slide-mode is off."
+Restore the buffer if the variable `org-tree-slide-mode' is off."
   (when (not org-tree-slide-mode)
     (org-tree-slide-pauses-end)) ) ;; defun
 

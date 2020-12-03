@@ -258,10 +258,14 @@ respectivelly."
   "Hide the image represented by the OVERLAY.
 If OVERLAY is not an image, just ignore it."
   (let ((display-props (overlay-get overlay 'display)))
-    (when (member 'image display-props)
+    (when (and (member 'image display-props)
+	       (not (some
+		     (lambda (elt)
+		       (member elt org-tree-slide-pauses-images-props-hidden))
+		     display-props)))
       (overlay-put overlay 'display
-		   (union display-props
-			  org-tree-slide-pauses-images-props-hidden)))))
+		   (append display-props
+			   org-tree-slide-pauses-images-props-hidden)))))
 
 (defun org-tree-slide-pauses-show-image (overlay)
   "Show the image represented by the OVERLAY.

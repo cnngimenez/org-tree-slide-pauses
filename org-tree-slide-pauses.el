@@ -234,7 +234,10 @@ Returns nil when:
     (overlay-put the-overlay 'invisible t))
   
   (dolist (the-overlay org-tree-slide-pauses-overlay-lists)
-    (overlay-put the-overlay 'face 'shadow)) ) ;; defun
+    (overlay-put the-overlay 'face 'shadow)
+    (org-tree-slide-pauses-all-images nil
+				      (overlay-start the-overlay)
+				      (overlay-end the-overlay))) ) ;; defun
 
 (defun org-tree-slide-pauses-show-pauses ()
   "Show everything to edit the buffer easily.
@@ -291,6 +294,7 @@ pauses parsing."
 
 (defun org-tree-slide-pauses-end ()
   "Restore the buffer and delete overlays."
+  (org-tree-slide-pauses-all-images t (point-min) (point-max))
   (org-tree-slide-pauses-clear-overlay-list) ) ;; defun
 
 
@@ -302,14 +306,15 @@ Basically, all text are stored as overlays in
 
 `org-tree-slide-pauses-current-pause' keep track of the number of overlays
 displayed."
-  
-  (when (nth org-tree-slide-pauses-current-pause
-	     org-tree-slide-pauses-overlay-lists)
-    (overlay-put (nth org-tree-slide-pauses-current-pause
-		      org-tree-slide-pauses-overlay-lists)
-		 'face nil)
-    (setq org-tree-slide-pauses-current-pause
-	  (1+ org-tree-slide-pauses-current-pause))) ) ;; defun
+  (let ((overlay (nth org-tree-slide-pauses-current-pause
+		      org-tree-slide-pauses-overlay-lists)))
+    (when overlay
+      (overlay-put overlay 'face nil)
+      (org-tree-slide-pauses-all-images t
+					(overlay-start overlay)
+					(overlay-end overlay))
+      (setq org-tree-slide-pauses-current-pause
+	    (1+ org-tree-slide-pauses-current-pause)))) ) ;; defun
 
 
 (defun org-tree-slide-pauses-next-advice (ots-move-next-tree &rest args)

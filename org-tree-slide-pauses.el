@@ -300,6 +300,12 @@ pauses parsing."
   (org-tree-slide-pauses-all-images t (point-min) (point-max))
   (org-tree-slide-pauses-clear-overlay-list) ) ;; defun
 
+(defun org-tree-slide-pauses-end-hook ()
+  "This is a hook for `org-tree-slide-mode-hook' to restore the buffer.
+Restore the buffer if the org-tree-slide-mode is off."
+  (when (not org-tree-slide-mode)
+    (org-tree-slide-pauses-end)) ) ;; defun
+
 
 (defun org-tree-slide-pauses-next-pause ()
   "Show next pause.
@@ -345,5 +351,6 @@ OTS-MOVE-NEXT-TREE, the original function with ARGS arguments)."
 	    :around #'org-tree-slide-pauses-next-advice)
 
 (add-hook 'org-tree-slide-after-narrow-hook #'org-tree-slide-pauses-init)
+(add-hook 'org-tree-slide-mode-hook #'org-tree-slide-pauses-end-hook)
 
 ;;; org-tree-slide-pauses.el ends here

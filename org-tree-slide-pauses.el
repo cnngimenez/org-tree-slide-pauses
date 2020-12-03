@@ -244,6 +244,43 @@ them visibles."
   (dolist (the-overlay org-tree-slide-pauses-pause-text-list)
     (overlay-put the-overlay 'invisible nil)) ) ;; defun
 
+(defconst org-tree-slide-pauses-images-props-hidden
+  '(:conversion emboss :mask heuristic)
+  "What properties to add or remove when hidding or showing images
+respectivelly."
+  ) ;; defconst
+
+
+(defun org-tree-slide-pauses-hide-image (overlay)
+  "Hide the image represented by the OVERLAY.
+If OVERLAY is not an image, just ignore it."
+  (let ((display-props (overlay-get overlay 'display)))
+    (when (member 'image display-props)
+      (overlay-put overlay 'display
+		   (union display-props
+			  org-tree-slide-pauses-images-props-hidden)))))
+
+(defun org-tree-slide-pauses-show-image (overlay)
+  "Show the image represented by the OVERLAY.
+If OVERLAY is not an image, just ignore it.
+The image should be hidden by `org-tree-slide-pauses-hide-image'."
+  (let* ((display-props (overlay-get overlay 'display))
+	 (pos (search org-tree-slide-pauses-images-props-hidden display-props)))
+    (when (and pos
+	       (member 'image display-props))
+      (overlay-put overlay 'display
+		   (append (subseq display-props 0 pos)
+			   (subseq display-props (+ pos (length org-tree-slide-pauses-images-props-hidden))))))))
+
+(defun org-tree-slide-pauses-all-images (show begin end)
+  "Search for overlay images between BEGIN and END points and show/hide them.
+If SHOW is t, then show them."
+  (map nil (lambda (overlay)
+	     (if show
+		 (org-tree-slide-pauses-show-image overlay)
+	       (org-tree-slide-pauses-hide-image overlay)))
+       (overlays-in begin end)) ) ;; defun
+
 
 (defun org-tree-slide-pauses-init ()
   "Search for pauses texts, create overlays and setup to start presentation.

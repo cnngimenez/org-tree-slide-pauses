@@ -104,7 +104,8 @@ This list is created with the `org-tree-slide-pauses-search-pauses'.")
 	   nil))
 	
 	((eq (org-element-type element) 'comment)
-	 (if (string-equal (org-element-property :value element) "pause")
+	 (if (string-equal (string-trim (org-element-property :value element))
+			   "pause")
 	     element
 	   nil))
 	

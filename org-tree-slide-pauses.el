@@ -20,7 +20,7 @@
 ;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
 ;;; Commentary:
@@ -305,7 +305,7 @@ pauses parsing."
 (defun org-tree-slide-pauses-end-hook ()
   "This is a hook for `org-tree-slide-mode-hook' to restore the buffer.
 Restore the buffer if the variable `org-tree-slide-mode' is off."
-  (when (not org-tree-slide-mode)
+  (unless org-tree-slide-mode
     (org-tree-slide-pauses-end)) ) ;; defun
 
 
@@ -345,9 +345,9 @@ OTS-MOVE-NEXT-TREE, the original function with ARGS arguments)."
 	)
     (progn
       (org-tree-slide-pauses-next-pause)
-      (message (format "Pauses: %d/%d"
-		       org-tree-slide-pauses-current-pause
-		       (length org-tree-slide-pauses-overlay-lists))))) ) ;; defun
+      (message "Pauses: %d/%d"
+	       org-tree-slide-pauses-current-pause
+	       (length org-tree-slide-pauses-overlay-lists)))) ) ;; defun
 
 (advice-add #'org-tree-slide-move-next-tree
 	    :around #'org-tree-slide-pauses-next-advice)

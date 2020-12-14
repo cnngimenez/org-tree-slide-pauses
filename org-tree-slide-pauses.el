@@ -1,4 +1,4 @@
-;;; org-tree-slide-pauses.el --- Bring the \pause Beamer to org-tree-slide!
+;;; org-tree-slide-pauses.el --- Bring the \pause Beamer to org-tree-slide!  -*- lexical-binding: t; -*-
 
 ;; Copyright 2020 cnngimenez
 ;;
@@ -52,6 +52,7 @@
 (provide 'org-tree-slide-pauses)
 (require 'org-element)
 (require 'org-tree-slide)
+(require 'cl-lib)
 
 ;;;;##########################################################################
 ;;;;  User Options, Variables
@@ -198,11 +199,11 @@ Returns nil when:
 	(result '()))
     
     (dolist (element lst-elements)
-      (add-to-list 'result (cons prev element) t)
+      (setq result (append result (list (cons prev element))))
       (setq prev element))
 
     (when prev
-      (add-to-list 'result (cons prev (point-max)) t))
+      (setq result (append result (list (cons prev (point-max))))))
     
     (cdr result)) ) ;; defun
 
@@ -258,7 +259,7 @@ them visibles."
 If OVERLAY is not an image, just ignore it."
   (let ((display-props (overlay-get overlay 'display)))
     (when (and (member 'image display-props)
-	       (not (some
+	       (not (cl-some
 		     (lambda (elt)
 		       (member elt org-tree-slide-pauses-images-props-hidden))
 		     display-props)))
@@ -271,12 +272,13 @@ If OVERLAY is not an image, just ignore it."
 If OVERLAY is not an image, just ignore it.
 The image should be hidden by `org-tree-slide-pauses-hide-image'."
   (let* ((display-props (overlay-get overlay 'display))
-	 (pos (search org-tree-slide-pauses-images-props-hidden display-props)))
+	 (pos (cl-search org-tree-slide-pauses-images-props-hidden
+			 display-props)))
     (when (and pos
 	       (member 'image display-props))
       (overlay-put overlay 'display
-		   (append (subseq display-props 0 pos)
-			   (subseq display-props (+ pos (length org-tree-slide-pauses-images-props-hidden))))))))
+		   (append (cl-subseq display-props 0 pos)
+			   (cl-subseq display-props (+ pos (length org-tree-slide-pauses-images-props-hidden))))))))
 
 (defun org-tree-slide-pauses-all-images (show begin end)
   "Search for overlay images between BEGIN and END points and show/hide them.

@@ -27,7 +27,7 @@
 
 ;; Bring animation like in Beamer into your org-tree-slide presentations!
 ;;
-;; Maunal installation:
+;; Manual installation:
 ;; Download the org-tree-slide-pauses.el.  Add the path to the `load-path'
 ;; variable and load it.  This can be added to the .emacs initialization file:
 ;;
@@ -244,14 +244,14 @@ Returns nil when:
 (defun org-tree-slide-pauses-show-pauses ()
   "Show everything to edit the buffer easily.
 This do not deletes the overlays that hides the pauses commands, it only make
-them visibles."
+them visible."
   (interactive)
   (dolist (the-overlay org-tree-slide-pauses-pause-text-list)
     (overlay-put the-overlay 'invisible nil)) ) ;; defun
 
 (defconst org-tree-slide-pauses-images-props-hidden
   '(:conversion emboss :mask heuristic)
-  "What properties to add or remove when hidding or showing images." ) ;; defconst
+  "What properties to add or remove when hiding or showing images." ) ;; defconst
 
 
 (defun org-tree-slide-pauses-hide-image (overlay)

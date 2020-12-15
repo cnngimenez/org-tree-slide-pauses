@@ -1,4 +1,4 @@
-;;; org-tree-slide-pauses.el --- Bring the \pause Beamer to org-tree-slide!  -*- lexical-binding: t; -*-
+;;; org-tree-slide-pauses.el --- Bring the pause command from Beamer to org-tree-slide  -*- lexical-binding: t; -*-
 
 ;; Copyright 2020 cnngimenez
 ;;
@@ -7,7 +7,7 @@
 ;; Version: 0.1.0
 ;; Keywords: convenience, org-mode, presentation
 ;; URL: https://github.com/cnngimenez/org-tree-slide-pauses
-;; Package-Requires: ((emacs "24.4") (org-tree-slide "2.8.4"))
+;; Package-Requires: ((emacs "24.5") (org-tree-slide "2.8.4"))
 
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -53,6 +53,7 @@
 (require 'org-element)
 (require 'org-tree-slide)
 (require 'cl-lib)
+(require 'cl-extra)
 
 ;;;;##########################################################################
 ;;;;  User Options, Variables
@@ -283,7 +284,7 @@ The image should be hidden by `org-tree-slide-pauses-hide-image'."
 (defun org-tree-slide-pauses-all-images (show begin end)
   "Search for overlay images between BEGIN and END points and show/hide them.
 If SHOW is t, then show them."
-  (map nil (lambda (overlay)
+  (cl-map nil (lambda (overlay)
 	     (if show
 		 (org-tree-slide-pauses-show-image overlay)
 	       (org-tree-slide-pauses-hide-image overlay)))
